@@ -34,6 +34,55 @@ orpen-skill-cli list --target codex
 
 The default registry is `github:orpendev/agent-skills`. Override per-call with `--registry github:owner/repo` or globally via the `ORPEN_SKILL_REGISTRY` environment variable.
 
+## Available skills
+
+The Orpen registry currently publishes four audited skills. All are stack-agnostic unless noted, all run as advisors (report findings; don't modify code), and all support `claude-code` plus the targets listed.
+
+| Name                                          | Targets                              | Purpose                                                                                                            |
+| --------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| [`mcp-bootstrap`](#mcp-bootstrap)             | `claude-code`                        | Scaffold a new MCP server repo (TypeScript + Express + zod) that boots out-of-the-box.                             |
+| [`sql-auditor`](#sql-auditor)                 | `claude-code`, `codex`               | Audit raw SQL in TypeScript diffs against schema-prefix / bind-variable / interpolation / DB-service conventions.  |
+| [`coupling-analysis`](#coupling-analysis)     | `claude-code`, `cursor`, `windsurf`  | Three-dimensional coupling review (strength × distance × volatility) from Khononov's *Balancing Coupling*.         |
+| [`domain-analysis`](#domain-analysis)         | `claude-code`, `cursor`, `windsurf`  | DDD strategic design — identify subdomains (Core / Supporting / Generic) and propose bounded contexts.             |
+
+Install any of them with `orpen-skill-cli install <name>`. Pin a version with `<name>@<version>`. Audit reports for each release live at `audits/skills/<name>/<version>.md` in the registry repo.
+
+### `mcp-bootstrap`
+
+Generates a complete TypeScript MCP server: structured logger, AsyncLocalStorage per-request context, generic typed HTTP client (timeout + sensitive-field redaction), `mcpTool()` wrapper that drops try/catch boilerplate, plus one sample domain hitting JSONPlaceholder so the new project boots and works without any wiring. The auth scheme stays as a placeholder for the user to plug in, with four commented examples (Basic, Bearer, API key, static env key).
+
+```bash
+orpen-skill-cli install mcp-bootstrap
+```
+
+### `sql-auditor`
+
+Reviews raw SQL in TypeScript diffs against four conventions: schema prefix (every table prefixed with the project's canonical schema reference), bind variable hygiene (no positional reuse — critical on Oracle), string interpolation safety (only the canonical schema reference inside template literals), and DB-service availability (no hardcoded schema strings). Targets NestJS/TypeORM-style projects with multi-schema databases (Oracle, Postgres). Output is grouped by file with `FAIL` / `NIT` severities and a final `PASS` / `PASS_WITH_NITS` / `FAIL` verdict.
+
+```bash
+orpen-skill-cli install sql-auditor
+```
+
+### `coupling-analysis`
+
+Six-phase coupling review based on the three-dimensional model from Vlad Khononov's *Balancing Coupling in Software Design*: context gathering → structural mapping (dependency graph + distance via encapsulation hierarchy) → integration-strength classification (Intrusive / Functional / Model / Contract) → volatility assessment (subdomain type + git history) → balance score (`STRENGTH × DISTANCE × VOLATILITY`) → structured report (executive summary, dependency map, issues by severity, prioritized recommendations). Stack-agnostic.
+
+The classification matters: tightly coupled components should live close together (high cohesion), distant components should be loosely coupled, and stable components can tolerate stronger coupling. The balance formula `BALANCE = (STRENGTH XOR DISTANCE) OR NOT VOLATILITY` is the heuristic the skill applies systematically.
+
+```bash
+orpen-skill-cli install coupling-analysis
+```
+
+### `domain-analysis`
+
+Three-phase DDD strategic-design playbook: extract domain concepts (entities, services, use cases, controllers — filtering out infrastructure) → group by ubiquitous language (linguistic boundaries, where term meanings shift = different bounded context) → classify subdomains via decision tree (Core: competitive advantage / Supporting: business-specific support / Generic: standard functionality). Output is a strategic map: extracted concepts, groupings, classified subdomains, and proposed context boundaries.
+
+Companion files live in `references/` after install (`EXAMPLES.md` with four worked-out domains — e-commerce, healthcare, SaaS project management, streaming video — and `QUICK-REFERENCE.md` with decision trees and integration patterns).
+
+```bash
+orpen-skill-cli install domain-analysis
+```
+
 ## Where things land
 
 | Target        | Install path                            |
