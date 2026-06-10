@@ -36,7 +36,7 @@ The default registry is `github:orpendev/agent-skills`. Override per-call with `
 
 ## Available skills
 
-The Orpen registry currently publishes four audited skills. All are stack-agnostic unless noted, all run as advisors (report findings; don't modify code), and all support `claude-code` plus the targets listed.
+The Orpen registry currently publishes six audited skills. All are stack-agnostic unless noted, and all support `claude-code` plus the targets listed.
 
 | Name                                          | Targets                              | Purpose                                                                                                            |
 | --------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
@@ -44,6 +44,8 @@ The Orpen registry currently publishes four audited skills. All are stack-agnost
 | [`sql-auditor`](#sql-auditor)                 | `claude-code`, `codex`               | Audit raw SQL in TypeScript diffs against schema-prefix / bind-variable / interpolation / DB-service conventions.  |
 | [`coupling-analysis`](#coupling-analysis)     | `claude-code`, `cursor`, `windsurf`  | Three-dimensional coupling review (strength × distance × volatility) from Khononov's *Balancing Coupling*.         |
 | [`domain-analysis`](#domain-analysis)         | `claude-code`, `cursor`, `windsurf`  | DDD strategic design — identify subdomains (Core / Supporting / Generic) and propose bounded contexts.             |
+| [`franco`](#franco)                           | all six runtimes                     | Calibrated adversarial-honesty posture for evaluating one concrete artifact (pt-BR).                               |
+| [`graphify`](#graphify)                       | `claude-code`                        | Build a persistent, queryable knowledge graph from any folder (code, docs, papers, images, videos).                |
 
 Install any of them with `orpen-skill-cli install <name>`. Pin a version with `<name>@<version>`. Audit reports for each release live at `audits/skills/<name>/<version>.md` in the registry repo.
 
@@ -81,6 +83,22 @@ Companion files live in `references/` after install (`EXAMPLES.md` with four wor
 
 ```bash
 orpen-skill-cli install domain-analysis
+```
+
+### `franco`
+
+Calibrated adversarial-honesty posture skill (written in pt-BR): full-response evaluation protocol for one concrete artifact — decision, code, plan, text, claim, or architecture. Verdict first, every load-bearing claim labeled `[fato]`/`[inferência]`/`[chute]`, failures ranked by severity, genuine merits stated flat, steelman when stakes are high, explicit uncertainty. Also confronts the premise of the request itself when it is wrong or self-contradictory. Pure prose — no commands, no filesystem, no network.
+
+```bash
+orpen-skill-cli install franco
+```
+
+### `graphify`
+
+Turns any folder (code, docs, papers, images, videos) into a persistent knowledge graph with community detection, god nodes, and an EXTRACTED/INFERRED/AMBIGUOUS audit trail; `query`/`path`/`explain` flows then answer codebase questions from the graph instead of re-reading files. Third-party content vendored from the MIT-licensed PyPI package `graphifyy` (the registry copy pins the package install to the audited version — see the audit report). `claude-code` only: the skill depends on Claude Code's subagent dispatch semantics.
+
+```bash
+orpen-skill-cli install graphify
 ```
 
 ## Where things land
