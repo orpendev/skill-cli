@@ -34,6 +34,10 @@ orpen-skill-cli list --target codex
 
 The default registry is `github:orpendev/agent-skills`. Override per-call with `--registry github:owner/repo` or globally via the `ORPEN_SKILL_REGISTRY` environment variable.
 
+### Private registries / rate limits
+
+The CLI talks to the GitHub API anonymously by default, which works for any public registry. To install from a private registry (or to avoid anonymous rate limits), set a token with read access to the repo — checked in this order: `ORPEN_SKILL_TOKEN`, `GITHUB_TOKEN`, `GH_TOKEN`. Note: GitHub answers 404 (not 403) for private repos the caller can't see, so a "repository not found" error against a registry you know exists usually means a missing or wrong token.
+
 ## Available skills
 
 The Orpen registry currently publishes six audited skills. All are stack-agnostic unless noted, and all support `claude-code` plus the targets listed.
@@ -117,7 +121,6 @@ Tags in the registry follow the pattern `skills/<name>/<version>` (e.g. `skills/
 - **Hash verification against the audit report.** Planned for v0.1.0.
 - **Per-tool format projection.** Skills currently install verbatim. When skills publish multi-tool content, the projection layer goes here.
 - **Update / uninstall.** Reinstall with `--force` for now; remove the directory manually for uninstall.
-- **Authenticated registries.** Public GitHub only.
 
 ## Default registry
 

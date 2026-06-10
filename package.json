@@ -1,6 +1,6 @@
 {
   "name": "orpen-skill-cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "CLI for installing audited skills/agents from the Orpen registry into local AI coding agents (Claude Code, Codex).",
   "license": "MIT",
   "type": "module",

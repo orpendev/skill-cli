@@ -8,7 +8,7 @@ import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
 import * as tar from "tar";
 
-const VERSION = "0.0.1";
+const VERSION = "0.0.3";
 const DEFAULT_REGISTRY = "github:orpendev/agent-skills";
 
 // ── helpers ──────────────────────────────────────────────────────────
@@ -73,10 +73,19 @@ async function pathExists(p: string): Promise<boolean> {
 
 // ── registry ──────────────────────────────────────────────────────────
 
-const GH_HEADERS = {
+// Private registries: GitHub's API returns 404 (not 403) for repos the caller
+// can't see, so an unauthenticated call against a private registry looks like
+// a missing repo. A token with read access fixes both the tags listing and the
+// tarball download (the tarball redirect target is pre-signed, so the token is
+// only needed on the initial request).
+const AUTH_TOKEN =
+  process.env.ORPEN_SKILL_TOKEN ?? process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
+
+const GH_HEADERS: Record<string, string> = {
   Accept: "application/vnd.github+json",
   "User-Agent": `orpen-skill-cli/${VERSION}`,
   "X-GitHub-Api-Version": "2022-11-28",
+  ...(AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {}),
 };
 
 async function fetchTagsForSkill(ref: RegistryRef, skillName: string): Promise<string[]> {
@@ -84,6 +93,13 @@ async function fetchTagsForSkill(ref: RegistryRef, skillName: string): Promise<s
   // releases), one page is enough. Revisit if/when this stops being true.
   const url = `https://api.github.com/repos/${ref.owner}/${ref.repo}/tags?per_page=100`;
   const res = await fetch(url, { headers: GH_HEADERS });
+  if (res.status === 404) {
+    throw new Error(
+      `Repository ${ref.owner}/${ref.repo} not found. If the registry is private, ` +
+        `set ORPEN_SKILL_TOKEN (or GITHUB_TOKEN) to a token with read access` +
+        (AUTH_TOKEN ? " — the current token does not see this repo." : "."),
+    );
+  }
   if (!res.ok) {
     throw new Error(
       `Failed to fetch tags from ${ref.owner}/${ref.repo}: ${res.status} ${res.statusText}`,
@@ -124,11 +140,16 @@ async function downloadTarball(
 ): Promise<void> {
   // Note: GitHub's tarball endpoint redirects to a codeload URL. fetch() follows
   // the redirect by default but the second request shouldn't carry the Accept
-  // header; we keep User-Agent for friendliness.
+  // header; we keep User-Agent for friendliness. The Authorization header is
+  // needed on the initial request for private repos; the redirect target is a
+  // pre-signed codeload URL (and undici drops auth headers cross-origin anyway).
   const url = `https://api.github.com/repos/${ref.owner}/${ref.repo}/tarball/refs/tags/${encodeURIComponent(tag)}`;
   const res = await fetch(url, {
     redirect: "follow",
-    headers: { "User-Agent": GH_HEADERS["User-Agent"] },
+    headers: {
+      "User-Agent": GH_HEADERS["User-Agent"],
+      ...(AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {}),
+    },
   });
   if (!res.ok || !res.body) {
     throw new Error(`Failed to download tarball: ${res.status} ${res.statusText}`);
