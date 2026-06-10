@@ -1,7 +1,7 @@
 {
   "name": "orpen-skill-cli",
   "version": "0.0.3",
-  "description": "CLI for installing audited skills/agents from the Orpen registry into local AI coding agents (Claude Code, Codex).",
+  "description": "CLI for installing audited skills/agents from the Orpen registry into local AI coding agents (Claude Code, Codex). Current catalog: mcp-bootstrap, sql-auditor, coupling-analysis, domain-analysis, franco, graphify.",
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/orpendev/skill-cli",
@@ -17,7 +17,16 @@
     "claude-code",
     "codex",
     "registry",
-    "cli"
+    "cli",
+    "mcp-bootstrap",
+    "sql-auditor",
+    "coupling-analysis",
+    "domain-analysis",
+    "franco",
+    "graphify",
+    "knowledge-graph",
+    "ddd",
+    "code-review"
   ],
   "bin": {
     "orpen-skill-cli": "dist/cli.js"
