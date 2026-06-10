@@ -124,7 +124,7 @@ Tags in the registry follow the pattern `skills/<name>/<version>` (e.g. `skills/
 
 ## Default registry
 
-`github:orpendev/agent-skills` is hardcoded as the default and is the registry curated by the Orpen team. Anyone can run their own audited skill registry following the same layout (`skills/<name>/SKILL.md` + `manifest.json` + tags shaped `skills/<name>/<version>`) and point this CLI at it via `--registry` or `ORPEN_SKILL_REGISTRY`.
+`github:orpendev/agent-skills` is hardcoded as the default and is the registry curated by the Orpen team. **It is a private repository** — installing from it requires a token with read access (see [Private registries](#private-registries--rate-limits) above); without one, the CLI reports it as not found. Anyone can run their own audited skill registry following the same layout (`skills/<name>/SKILL.md` + `manifest.json` + tags shaped `skills/<name>/<version>`) and point this CLI at it via `--registry` or `ORPEN_SKILL_REGISTRY`.
 
 ## License
 
