@@ -4,7 +4,11 @@ CLI for installing audited skills/agents from an Orpen-style registry into local
 
 This tool is a thin fetcher: it resolves a tag, downloads the matching tarball from the registry's GitHub repository, and copies the skill folder to the right place on disk. The audit happens in the registry, not here — this CLI doesn't decide what's safe to install.
 
+> **Before anything:** the default registry (`github:orpendev/agent-skills`) is a **private** repository. Installing from it requires a GitHub token with read access — set `ORPEN_SKILL_TOKEN` (or `GITHUB_TOKEN`) first, or point the CLI at your own registry with `--registry`. Without a token, the default registry shows up as "not found".
+
 ## Install
+
+Requires Node >= 18 (built-in `fetch`).
 
 ```bash
 npm install -g orpen-skill-cli
@@ -13,6 +17,9 @@ npm install -g orpen-skill-cli
 ## Usage
 
 ```bash
+# default registry is private — token with read access required (see note above)
+export ORPEN_SKILL_TOKEN=<github token with read access to the registry>
+
 # install latest version of a skill
 orpen-skill-cli install mcp-bootstrap
 
@@ -48,7 +55,7 @@ The Orpen registry currently publishes six audited skills. All are stack-agnosti
 | [`sql-auditor`](#sql-auditor)                 | `claude-code`, `codex`               | Audit raw SQL in TypeScript diffs against schema-prefix / bind-variable / interpolation / DB-service conventions.  |
 | [`coupling-analysis`](#coupling-analysis)     | `claude-code`, `cursor`, `windsurf`  | Three-dimensional coupling review (strength × distance × volatility) from Khononov's *Balancing Coupling*.         |
 | [`domain-analysis`](#domain-analysis)         | `claude-code`, `cursor`, `windsurf`  | DDD strategic design — identify subdomains (Core / Supporting / Generic) and propose bounded contexts.             |
-| [`franco`](#franco)                           | all six runtimes                     | Calibrated adversarial-honesty posture for evaluating one concrete artifact (pt-BR).                               |
+| [`franco`](#franco)                           | any runtime (pure prose)             | Calibrated adversarial-honesty posture for evaluating one concrete artifact (pt-BR).                               |
 | [`graphify`](#graphify)                       | `claude-code`                        | Build a persistent, queryable knowledge graph from any folder (code, docs, papers, images, videos).                |
 
 Install any of them with `orpen-skill-cli install <name>`. Pin a version with `<name>@<version>`. Audit reports for each release live at `audits/skills/<name>/<version>.md` in the registry repo.
