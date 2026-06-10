@@ -36,7 +36,10 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
 
+      # Trusted publishing (OIDC): auth comes from the GitHub Actions identity
+      # registered as a trusted publisher on npmjs.com — no NPM_TOKEN secret.
+      # Requires npm >= 11.5.1 (Node 22 bundles npm 10.x, so upgrade first).
+      - run: npm install -g npm@latest
+
       - name: Publish to npm with provenance
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
